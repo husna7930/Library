@@ -1,0 +1,150 @@
+package com.example.library.ServiceTest;
+
+import com.example.library.dto.BookDTO;
+import com.example.library.dto.BookRegistrationResponse;
+import com.example.library.model.Book;
+import com.example.library.model.BookRecord;
+import com.example.library.repository.BookRecordRepository;
+import com.example.library.repository.BookRepository;
+import com.example.library.service.BookService;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+
+import java.util.List;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+
+class BookServiceTest {
+
+    private BookRepository bookRepository;
+    private BookRecordRepository bookRecordRepository;
+    private BookService bookService;
+
+    @BeforeEach
+    void setUp() {
+        bookRepository = Mockito.mock(BookRepository.class);
+        bookRecordRepository = Mockito.mock(BookRecordRepository.class);
+        bookService = new BookService(bookRepository, bookRecordRepository);
+    }
+
+    @Test
+    void testRegisterBook_Success() {
+        BookDTO dto = new BookDTO();
+        dto.setTitle("Effective Java");
+        dto.setAuthor("Joshua Bloch");
+        dto.setIsbn("1111-1111-2222");
+
+        when(bookRepository.existsByIsbn(dto.getIsbn()))
+                .thenReturn(false);
+
+        Book savedBook = new Book();
+        savedBook.setId(1);
+        savedBook.setTitle(dto.getTitle());
+        savedBook.setAuthor(dto.getAuthor());
+        savedBook.setIsbn(dto.getIsbn());
+
+        when(bookRepository.save(any(Book.class))).thenReturn(savedBook);
+
+        BookRecord savedRecord = new BookRecord();
+        savedRecord.setBook(savedBook);
+        savedRecord.setIsbn(savedBook.getIsbn());
+        savedRecord.setTitle(savedBook.getTitle());
+        savedRecord.setAuthor(savedBook.getAuthor());
+        savedRecord.setStatus("AVAILABLE");
+
+        when(bookRecordRepository.save(any(BookRecord.class))).thenReturn(savedRecord);
+
+        BookRegistrationResponse result = bookService.registerBook(dto);
+
+        assertEquals("Effective Java", result.getBook().getTitle());
+        assertEquals("Joshua Bloch", result.getBook().getAuthor());
+        assertEquals("1111-1111-2222", result.getBook().getIsbn());
+    }
+
+    @Test
+    void testRegisterBook_DuplicateThrowsException() {
+        BookDTO dto = new BookDTO();
+        dto.setTitle("Effective Java");
+        dto.setAuthor("Joshua Bloch");
+        dto.setIsbn("1111-1111-2222");
+
+        when(bookRepository.existsByIsbn(dto.getIsbn()))
+                .thenReturn(true);
+
+        assertThrows(IllegalArgumentException.class,
+                () -> bookService.registerBook(dto));
+    }
+
+    @Test
+    void testUpdateBook_Success() {
+        Book existing = new Book();
+        existing.setId(1);
+        existing.setTitle("Old Title");
+        existing.setAuthor("Old Author");
+        existing.setIsbn("0000");
+
+        BookDTO dto = new BookDTO();
+        dto.setTitle("New Title");
+        dto.setAuthor("New Author");
+        dto.setIsbn("1111");
+
+        when(bookRepository.findById(1)).thenReturn(Optional.of(existing));
+        when(bookRepository.save(existing)).thenReturn(existing);
+
+        BookRecord records = new BookRecord();
+        records.setBookRecordId(100);
+        records.setBook(existing);
+        records.setTitle("Old Title");
+        records.setAuthor("Old Author");
+        records.setIsbn("0000");
+
+        when(bookRecordRepository.findByBookId(1)).thenReturn(List.of(records));
+
+        BookRegistrationResponse response = bookService.updateBook(1, dto);
+
+        assertEquals("New Title", response.getBook().getTitle());
+        assertEquals("New Author", response.getBook().getAuthor());
+        assertEquals("1111", response.getBook().getIsbn());
+        verify(bookRecordRepository, times(1)).save(records);
+    }
+
+    @Test
+    void testUpdateBook_NotFoundThrowsException() {
+        BookDTO dto = new BookDTO();
+        dto.setTitle("New Title");
+        dto.setAuthor("New Author");
+        dto.setIsbn("1111");
+
+        when(bookRepository.findById(1)).thenReturn(Optional.empty());
+
+        assertThrows(IllegalArgumentException.class,
+                () -> bookService.updateBook(1, dto));
+    }
+
+    @Test
+    void testDeleteBook() {
+        bookService.deleteBook(1);
+        verify(bookRecordRepository, times(1)).deleteByBookId(1);
+        verify(bookRepository, times(1)).deleteById(1);
+    }
+
+    @Test
+    void testGetAllBooks() {
+        Book book = new Book();
+        book.setId(1);
+        book.setTitle("Effective Java");
+        book.setAuthor("Joshua Bloch");
+        book.setIsbn("1111-1111-2222");
+
+        when(bookRepository.findAll()).thenReturn(List.of(book));
+
+        List<BookDTO> result = bookService.getAllBooks();
+
+        assertEquals(1, result.size());
+        assertEquals("Effective Java", result.get(0).getTitle());
+    }
+}
