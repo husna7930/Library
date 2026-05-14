@@ -25,7 +25,7 @@ This project demonstrates RESTful API design, DTO usage, and controller/service 
 ## ⚙️ Setup Instructions
 
 ### 1. Clone the repository
-git clone https://github.com/your-username/library-system.git
+git clone https://github.com/husna7930/Library.git
 cd library-system
 
 ## Run Locally
@@ -47,7 +47,7 @@ update Update src/main/resources/application.properties
 
 1. Run with PostgresSQL
 
-spring.datasource.url=jdbc:postgresql://localhost:5432/librarydb
+spring.datasource.url=${DB_URL}
 spring.datasource.username=${DB_USERNAME}
 spring.datasource.password=${DB_PASSWORD}
 spring.jpa.hibernate.ddl-auto=update
