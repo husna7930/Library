@@ -9,6 +9,7 @@ import com.example.library.repository.BookRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Optional;
@@ -61,10 +62,10 @@ class BookRecordServiceTest {
 
     @Test
     void testRegisterCopy_BookNotFoundThrowsException() {
-        when(bookRepository.findById(1)).thenReturn(Optional.empty());
+        when(bookRepository.findById(999)).thenReturn(Optional.empty());
 
-        assertThrows(IllegalArgumentException.class,
-                () -> bookRecordService.registerCopy(1));
+        assertThrows(ResponseStatusException.class,
+                () -> bookRecordService.registerCopy(999));
     }
 
     @Test
@@ -105,5 +106,14 @@ class BookRecordServiceTest {
         assertEquals(1, result.size());
         assertEquals("Effective Java", result.get(0).getTitle());
         assertEquals("AVAILABLE", result.get(0).getStatus());
+    }
+
+    @Test
+    void testDeleteCopies_success() {
+        doNothing().when(bookRecordRepository).deleteById(100);
+
+        bookRecordService.deleteCopies(100);
+
+        verify(bookRecordRepository).deleteById(100);
     }
 }

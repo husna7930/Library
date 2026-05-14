@@ -3,6 +3,7 @@ package com.example.library.dto;
 import com.example.library.model.Book;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import java.util.List;
 
 public class BookRecordDTO {
@@ -12,7 +13,7 @@ public class BookRecordDTO {
     @JsonIgnore
     private Book book;
 
-    @NotBlank(message = "Book ID cannot be null")
+    @NotNull(message = "Book ID cannot be null")
     private Integer bookId;
 
     @NotBlank(message = "ISBN cannot be null")

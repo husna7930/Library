@@ -7,6 +7,7 @@ public class BorrowedRecordDTO {
     private Integer borrowedRecordId;
     private Integer borrowerId;
     private Integer bookRecordId;
+    private Integer bookId;
     private LocalDate borrowDate;
     private LocalDate dueDate;
     private LocalDate returnDate;
@@ -33,6 +34,14 @@ public class BorrowedRecordDTO {
 
     public void setBookRecordId(Integer bookRecordId) {
         this.bookRecordId = bookRecordId;
+    }
+
+    public Integer getBookId() {
+        return bookId;
+    }
+
+    public void setBookId(Integer bookId) {
+        this.bookId = bookId;
     }
 
     public LocalDate getBorrowDate() {

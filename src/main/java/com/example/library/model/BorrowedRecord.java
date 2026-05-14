@@ -19,6 +19,8 @@ public class BorrowedRecord {
 
     private Integer borrowerId;
 
+    private Integer bookId;
+
     private LocalDate borrowDate;
 
     private LocalDate returnDate;
@@ -47,6 +49,14 @@ public class BorrowedRecord {
 
     public void setBorrowerId(Integer borrowerId) {
         this.borrowerId = borrowerId;
+    }
+
+    public Integer getBookId() {
+        return bookId;
+    }
+
+    public void setBookId(Integer bookId) {
+        this.bookId = bookId;
     }
 
     public LocalDate getBorrowDate() {

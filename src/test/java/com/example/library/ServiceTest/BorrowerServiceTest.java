@@ -122,7 +122,30 @@ class BorrowerServiceTest {
 
     @Test
     void testDeleteBorrower() {
+        // Arrange
+        when(borrowerRepository.existsById(1)).thenReturn(true);
+        doNothing().when(borrowerRepository).deleteById(1);
+
+        // Act
         borrowerService.deleteBorrower(1);
-        verify(borrowerRepository, times(1)).deleteById(1);
+
+        // Assert
+        verify(borrowerRepository).existsById(1);
+        verify(borrowerRepository).deleteById(1);
     }
+
+    @Test
+    void testDeleteBorrower_notFoundThrowsException() {
+        // Arrange
+        when(borrowerRepository.existsById(999)).thenReturn(false);
+
+        // Act & Assert
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+                () -> borrowerService.deleteBorrower(999));
+
+        assertEquals("Borrower not found", exception.getMessage());
+        verify(borrowerRepository).existsById(999);
+        verify(borrowerRepository, never()).deleteById(anyInt());
+    }
+
 }

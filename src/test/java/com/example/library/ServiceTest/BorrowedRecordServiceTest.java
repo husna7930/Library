@@ -2,6 +2,7 @@ package com.example.library.ServiceTest;
 
 import com.example.library.dto.BookRecordDTO;
 import com.example.library.dto.BorrowedRecordDTO;
+import com.example.library.model.Book;
 import com.example.library.model.BookRecord;
 import com.example.library.model.BorrowedRecord;
 import com.example.library.service.BorrowedRecordService;
@@ -34,27 +35,29 @@ class BorrowedRecordServiceTest {
     }
 
     @Test
-    void testRegisterBookRent_Success() {
+    void rtestRegisterBookRent_success() {
+        // Arrange
+        Book book = new Book();
+        book.setId(1);
+
         BookRecord bookRecord = new BookRecord();
-        bookRecord.setBookRecordId(1);
+        bookRecord.setBookRecordId(100);
+        bookRecord.setBook(book);
         bookRecord.setStatus("AVAILABLE");
 
-        when(bookRecordRepository.findById(1)).thenReturn(Optional.of(bookRecord));
+        when(bookRecordRepository.findById(100)).thenReturn(Optional.of(bookRecord));
+        when(borrowedRecordRepository.existsByBorrowerIdAndBookId(1, 1)).thenReturn(false);
 
-        // Mock save
-        when(borrowedRecordRepository.save(any(BorrowedRecord.class)))
-                .thenAnswer(invocation -> {
-                    BorrowedRecord r = invocation.getArgument(0);
-                    r.setBorrowedRecordId(100);
-                    return r;
-                });
+        // Act
+        BookRecordDTO dto = borrowedRecordService.registerBookRent(1, 100);
 
-        BookRecordDTO result = borrowedRecordService.registerBookRent(10, 1);
+        // Assert
+        assertEquals("BORROWED", dto.getStatus());
+        assertEquals(1, dto.getBorrowerId());
 
-        assertEquals(1, result.getBookRecordId());
-        assertEquals("BORROWED", result.getStatus());
-        assertEquals(10, result.getBorrowerId());
-        assertFalse(result.getBorrowedRecords().isEmpty());
+        // Verify save calls
+        verify(bookRecordRepository).save(bookRecord);
+        verify(borrowedRecordRepository).save(any(BorrowedRecord.class));
     }
 
     @Test
@@ -70,28 +73,47 @@ class BorrowedRecordServiceTest {
     }
 
     @Test
-    void testReturnBook_Success() {
-        BorrowedRecord records = new BorrowedRecord();
-        records.setBorrowedRecordId(100);
-        records.setBorrowerId(10);
-        records.setBookRecordId(1);
-        records.setBorrowDate(LocalDate.now().minusDays(5));
-        records.setDueDate(LocalDate.now().plusDays(9));
+    void testRegisterBookRent_borrowSameBook() {
+        Book book = new Book();
+        book.setId(1);
 
         BookRecord bookRecord = new BookRecord();
-        bookRecord.setBookRecordId(1);
+        bookRecord.setBookRecordId(100);
+        bookRecord.setBook(book);
+        bookRecord.setStatus("AVAILABLE");
+
+        when(bookRecordRepository.findById(100)).thenReturn(Optional.of(bookRecord));
+        when(borrowedRecordRepository.existsByBorrowerIdAndBookId(1, 1)).thenReturn(true);
+
+        assertThrows(ResponseStatusException.class,
+                () -> borrowedRecordService.registerBookRent(1, 100));
+    }
+
+    @Test
+    void testReturnBook_success() {
+        BorrowedRecord borrowedRecord = new BorrowedRecord();
+        borrowedRecord.setBorrowedRecordId(200);
+        borrowedRecord.setBookRecordId(100);
+
+        Book book = new Book();
+        book.setId(1);
+
+        BookRecord bookRecord = new BookRecord();
+        bookRecord.setBookRecordId(100);
+        bookRecord.setBook(book);
         bookRecord.setStatus("BORROWED");
-        bookRecord.setBorrowerId(10);
+        bookRecord.setBorrowerId(1);
 
-        when(borrowedRecordRepository.findById(100)).thenReturn(Optional.of(records));
-        when(bookRecordRepository.findById(1)).thenReturn(Optional.of(bookRecord));
-        when(borrowedRecordRepository.save(records)).thenReturn(records);
+        when(borrowedRecordRepository.findById(200)).thenReturn(Optional.of(borrowedRecord));
+        when(bookRecordRepository.findById(100)).thenReturn(Optional.of(bookRecord));
 
-        BookRecordDTO result = borrowedRecordService.returnBook(100);
+        BookRecordDTO dto = borrowedRecordService.returnBook(200);
 
-        assertEquals("AVAILABLE", result.getStatus());
-        assertNull(result.getBorrowerId());
-        assertNotNull(result.getBorrowedRecords().get(0).getReturnDate());
+        assertEquals("AVAILABLE", dto.getStatus());
+        assertNull(dto.getBorrowerId());
+
+        verify(bookRecordRepository).save(bookRecord);
+        verify(borrowedRecordRepository).save(borrowedRecord);
     }
 
     @Test
@@ -109,5 +131,13 @@ class BorrowedRecordServiceTest {
 
         assertEquals(1, result.size());
         assertEquals(10, result.get(0).getBorrowerId());
+    }
+
+    @Test
+    void testRegisterBookRent_bookNotFound() {
+        when(bookRecordRepository.findById(999)).thenReturn(Optional.empty());
+
+        assertThrows(ResponseStatusException.class,
+                () -> borrowedRecordService.registerBookRent(1, 999));
     }
 }

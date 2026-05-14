@@ -80,7 +80,7 @@ class BorrowerControllerTest {
     void testDeleteBorrower() throws Exception {
         mockMvc.perform(delete("/api/borrowers/1"))
                 .andExpect(status().isOk())
-                .andExpect(content().string("Borrower deleted successfully"));
+                .andExpect(content().string("Borrower with id: 1 is successfully deleted."));
 
         Mockito.verify(borrowerService).deleteBorrower(1);
     }

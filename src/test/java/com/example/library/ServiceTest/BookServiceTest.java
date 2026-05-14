@@ -7,6 +7,9 @@ import com.example.library.model.BookRecord;
 import com.example.library.repository.BookRecordRepository;
 import com.example.library.repository.BookRepository;
 import com.example.library.service.BookService;
+
+import jakarta.persistence.EntityNotFoundException;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -81,35 +84,38 @@ class BookServiceTest {
 
     @Test
     void testUpdateBook_Success() {
+        BookDTO dto = new BookDTO();
+        dto.setIsbn("54321");
+        dto.setTitle("Updated Title");
+        dto.setAuthor("Updated Author");
+
         Book existing = new Book();
         existing.setId(1);
+        existing.setIsbn("12345");
         existing.setTitle("Old Title");
         existing.setAuthor("Old Author");
-        existing.setIsbn("0000");
 
-        BookDTO dto = new BookDTO();
-        dto.setTitle("New Title");
-        dto.setAuthor("New Author");
-        dto.setIsbn("1111");
+        BookRecord recordsBookRecord = new BookRecord();
+        recordsBookRecord.setBookRecordId(100);
+        recordsBookRecord.setBook(existing);
+        recordsBookRecord.setIsbn("12345");
+        recordsBookRecord.setTitle("Old Title");
+        recordsBookRecord.setAuthor("Old Author");
+        recordsBookRecord.setStatus("AVAILABLE");
 
         when(bookRepository.findById(1)).thenReturn(Optional.of(existing));
-        when(bookRepository.save(existing)).thenReturn(existing);
-
-        BookRecord records = new BookRecord();
-        records.setBookRecordId(100);
-        records.setBook(existing);
-        records.setTitle("Old Title");
-        records.setAuthor("Old Author");
-        records.setIsbn("0000");
-
-        when(bookRecordRepository.findByBookId(1)).thenReturn(List.of(records));
+        when(bookRepository.existsByIsbn("54321")).thenReturn(false);
+        when(bookRepository.save(any(Book.class))).thenReturn(existing);
+        when(bookRecordRepository.findByBookId(1)).thenReturn(List.of(recordsBookRecord));
+        when(bookRecordRepository.save(any(BookRecord.class))).thenReturn(recordsBookRecord);
 
         BookRegistrationResponse response = bookService.updateBook(1, dto);
 
-        assertEquals("New Title", response.getBook().getTitle());
-        assertEquals("New Author", response.getBook().getAuthor());
-        assertEquals("1111", response.getBook().getIsbn());
-        verify(bookRecordRepository, times(1)).save(records);
+        assertEquals("Book updated successfully", response.getMessage());
+        assertEquals("Updated Title", response.getBook().getTitle());
+        assertEquals("54321", response.getBook().getIsbn());
+        assertEquals(1, response.getBookRecord().size());
+        assertEquals("Updated Title", response.getBookRecord().get(0).getTitle());
     }
 
     @Test
@@ -121,7 +127,7 @@ class BookServiceTest {
 
         when(bookRepository.findById(1)).thenReturn(Optional.empty());
 
-        assertThrows(IllegalArgumentException.class,
+        assertThrows(EntityNotFoundException.class,
                 () -> bookService.updateBook(1, dto));
     }
 
@@ -146,5 +152,11 @@ class BookServiceTest {
 
         assertEquals(1, result.size());
         assertEquals("Effective Java", result.get(0).getTitle());
+    }
+
+    @Test
+    void testDeleteBook_nullId() {
+        assertThrows(IllegalArgumentException.class,
+                () -> bookService.deleteBook(null));
     }
 }

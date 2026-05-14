@@ -40,16 +40,16 @@ public class BorrowedRecordService {
 
         // Check if borrower already has another copy of the same book
         boolean alreadyBorrowedSameBook = borrowedRecordRepository
-                .existsByBorrowerIdAndBookIdAndReturnDateIsNull(borrowerId, bookRecord.getBook().getId());
+                .existsByBorrowerIdAndBookId(borrowerId, bookRecord.getBook().getId());
 
         if (alreadyBorrowedSameBook) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                    "Borrower already has a copy of this book");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Borrower already has a copy of this book");
         }
 
         BorrowedRecord recordsBorrowedRecord = new BorrowedRecord();
         recordsBorrowedRecord.setBorrowerId(borrowerId);
         recordsBorrowedRecord.setBookRecordId(bookRecordId);
+        recordsBorrowedRecord.setBookId(bookRecord.getBook().getId());
         recordsBorrowedRecord.setBorrowDate(LocalDate.now());
         recordsBorrowedRecord.setDueDate(LocalDate.now().plusDays(14));
         recordsBorrowedRecord.setReturnDate(null);
@@ -94,6 +94,7 @@ public class BorrowedRecordService {
         BorrowedRecordDTO dto = new BorrowedRecordDTO();
         dto.setBorrowedRecordId(records.getBorrowedRecordId());
         dto.setBorrowerId(records.getBorrowerId());
+        dto.setBookId(records.getBookId());
         dto.setBookRecordId(records.getBookRecordId());
         dto.setBorrowDate(records.getBorrowDate());
         dto.setDueDate(records.getDueDate());

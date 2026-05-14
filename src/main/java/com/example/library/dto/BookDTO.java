@@ -6,7 +6,6 @@ import jakarta.validation.constraints.NotBlank;
 public class BookDTO {
 
     @Id
-    @NotBlank(message = "ID cannot be null")
     private Integer id;
 
     @NotBlank(message = "ISBN cannot be null")
