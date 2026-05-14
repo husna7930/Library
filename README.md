@@ -7,9 +7,15 @@ This project demonstrates RESTful API design, DTO usage, and controller/service 
 
 ## 🚀 Features
 - Register, update, and delete books
+- Register, update and delete borrower
 - Borrow and return books
 - View all borrowed records
 - View borrowed records by borrower
+- A borrower can borrow multiple books, but only one copy of a specific book id at a time.
+- ISBN validation ensures consistency: same ISBN → same title & author. 
+- Books with the same ISBN cannot be registered new, it will be registered as a copy book in book record.
+- Multiple copies of the book will be recorded in the book record.
+- Returning a book frees it for others. 
 
 -------------------------------------------------------------------------
 
@@ -19,45 +25,6 @@ This project demonstrates RESTful API design, DTO usage, and controller/service 
 - Spring Data JPA
 - PostgreSQL (or any relational DB)
 - Maven
-
--------------------------------------------------------------------------
-
-## ⚙️ Setup Instructions
-
-### 1. Clone the repository
-git clone https://github.com/husna7930/Library.git
-
-## Run Locally
-2. Build the Project
-run → mvn clean package
-run → java -jar target/library-0.0.1-SNAPSHOT.jar
-
--------------------------------------------------------------------------
-
-## The application will start on:
-http://localhost:8080
-
--------------------------------------------------------------------------
-
-
-## Database Configuration
-
-update Update src/main/resources/application.properties
-
-1. Run with PostgresSQL
-
-spring.datasource.url=${DB_URL}
-spring.datasource.username=${DB_USERNAME}
-spring.datasource.password=${DB_PASSWORD}
-spring.jpa.hibernate.ddl-auto=update
-spring.jpa.show-sql=true
-
-2. Run wuth H2
-
-spring.datasource.url=jdbc:h2:mem:testdb
-spring.datasource.driver-class-name=org.h2.Driver
-spring.jpa.hibernate.ddl-auto=create-drop
-spring.h2.console.enabled=true
 
 -------------------------------------------------------------------------
 
@@ -81,7 +48,56 @@ spring.h2.console.enabled=true
 - GET /api/borrowedRecords/borrower/{borrowerId} → List a borrower book records 
 -------------------------------------------------------------------------
 
-## Testing 
+## ⚙️ Setup Instructions
+
+### 1. Clone the repository
+git clone https://github.com/husna7930/Library.git
+
+## Run Locally
+2. Build the Project
+run → mvn clean package
+run → java -jar target/library-0.0.1-SNAPSHOT.jar
+
+-------------------------------------------------------------------------
+
+## The application will start on:
+http://localhost:8080
+
+-------------------------------------------------------------------------
+
+
+## Database Configuration (Choosen DB)
+
+Update file path:
+src/main/resources/application.properties
+
+1. Run with PostgresSQL
+
+spring.datasource.url=${DB_URL}
+spring.datasource.username=${DB_USERNAME}
+spring.datasource.password=${DB_PASSWORD}
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+
+2. Run with H2
+
+spring.datasource.url=jdbc:h2:mem:testdb
+spring.datasource.driver-class-name=org.h2.Driver
+spring.jpa.hibernate.ddl-auto=create-drop
+spring.h2.console.enabled=true
+
+-------------------------------------------------------------------------
+
+## Testing
 run → mvn test
 
+## Postman Test
+Postman Collection folder path:
+https://github.com/husna7930/Library/tree/main/docs/Postman/
+File name: Demo Api.postman_collection.json
+
+## Documentation on my API
+Full Documentation folder path:
+https://github.com/husna7930/Library/tree/main/docs/API%20Documentation
+File name: Library System REST API Documentation.pdf
 
