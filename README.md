@@ -56,7 +56,9 @@ git clone https://github.com/husna7930/Library.git
 
 ## Run Locally
 2. Build the Project
+
 run → mvn clean package
+
 run → java -jar target/library-0.0.1-SNAPSHOT.jar
 
 -------------------------------------------------------------------------
@@ -75,16 +77,23 @@ src/main/resources/application.properties
 1. Run with PostgresSQL
 
 spring.datasource.url=${DB_URL}
+
 spring.datasource.username=${DB_USERNAME}
+
 spring.datasource.password=${DB_PASSWORD}
+
 spring.jpa.hibernate.ddl-auto=update
+
 spring.jpa.show-sql=true
 
 2. Run with H2
 
 spring.datasource.url=jdbc:h2:mem:testdb
+
 spring.datasource.driver-class-name=org.h2.Driver
+
 spring.jpa.hibernate.ddl-auto=create-drop
+
 spring.h2.console.enabled=true
 
 -------------------------------------------------------------------------
