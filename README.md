@@ -26,7 +26,6 @@ This project demonstrates RESTful API design, DTO usage, and controller/service 
 
 ### 1. Clone the repository
 git clone https://github.com/husna7930/Library.git
-cd library-system
 
 ## Run Locally
 2. Build the Project
