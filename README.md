@@ -1,7 +1,8 @@
 # 📚 Library Management System
 
-A Spring Boot application for managing books and borrowed records in a library.  
+A Spring Boot application for managing books and borrowed records in a library.
 This project demonstrates RESTful API design, DTO usage, and controller/service separation.
+Built with Java 17, Spring Boot, Maven, and PostgreSQL for reliable relational data management.
 
 -------------------------------------------------------------------------
 
@@ -66,7 +67,7 @@ http://localhost:8080
 -------------------------------------------------------------------------
 
 
-## Database Configuration (Choosen DB)
+## Database Configuration (option DB)
 
 Update file path:
 src/main/resources/application.properties
@@ -94,10 +95,12 @@ run → mvn test
 ## Postman Test
 Postman Collection folder path:
 https://github.com/husna7930/Library/tree/main/docs/Postman/
+
 File name: Demo Api.postman_collection.json
 
 ## Documentation on my API
 Full Documentation folder path:
 https://github.com/husna7930/Library/tree/main/docs/API%20Documentation
+
 File name: Library System REST API Documentation.pdf
 
