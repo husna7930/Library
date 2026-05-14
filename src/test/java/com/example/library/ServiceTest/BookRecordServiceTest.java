@@ -110,10 +110,12 @@ class BookRecordServiceTest {
 
     @Test
     void testDeleteCopies_success() {
+
+        when(bookRecordRepository.existsById(100)).thenReturn(true);
         doNothing().when(bookRecordRepository).deleteById(100);
-
         bookRecordService.deleteCopies(100);
-
         verify(bookRecordRepository).deleteById(100);
+        verify(bookRecordRepository).existsById(100);
+
     }
 }

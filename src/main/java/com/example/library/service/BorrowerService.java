@@ -2,7 +2,11 @@ package com.example.library.service;
 
 import com.example.library.model.Borrower;
 import com.example.library.repository.BorrowerRepository;
+
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
+
 import com.example.library.dto.BorrowerDTO;
 
 import java.util.List;
@@ -44,7 +48,7 @@ public class BorrowerService {
 
     public BorrowerDTO updateBorrower(Integer id, BorrowerDTO dto) {
         Borrower borrower = borrowerRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Borrower not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Borrower not found"));
 
         if (borrowerRepository.existsByNameAndEmail(dto.getName(), dto.getEmail())) {
             throw new IllegalArgumentException("Borrower with this name and email already exists");
@@ -57,7 +61,7 @@ public class BorrowerService {
 
     public void deleteBorrower(Integer id) {
         if (!borrowerRepository.existsById(id)) {
-            throw new IllegalArgumentException("Borrower not found");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Borrower not found");
         }
         borrowerRepository.deleteById(id);
     }

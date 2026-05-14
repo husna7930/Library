@@ -10,6 +10,5 @@ public interface BorrowedRecordRepository extends JpaRepository<BorrowedRecord, 
 
      List<BorrowedRecord> findByBookRecordId(Integer bookRecordId);
 
-     boolean existsByBorrowerIdAndBookId(Integer borrowerId, Integer bookId);
-
+     boolean existsByBorrowerIdAndBookIdAndReturnDateIsNull(Integer borrowerId, Integer bookId);
 }

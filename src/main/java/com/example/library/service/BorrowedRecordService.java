@@ -40,7 +40,7 @@ public class BorrowedRecordService {
 
         // Check if borrower already has another copy of the same book
         boolean alreadyBorrowedSameBook = borrowedRecordRepository
-                .existsByBorrowerIdAndBookId(borrowerId, bookRecord.getBook().getId());
+                .existsByBorrowerIdAndBookIdAndReturnDateIsNull(borrowerId, bookRecord.getBook().getId());
 
         if (alreadyBorrowedSameBook) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Borrower already has a copy of this book");

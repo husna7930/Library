@@ -48,6 +48,11 @@ public class BookRecordService {
     }
 
     public void deleteCopies(Integer bookRecordId) {
+
+        if (!bookRecordRepository.existsById(bookRecordId)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Book does not exist");
+        }
+
         bookRecordRepository.deleteById(bookRecordId);
     }
 

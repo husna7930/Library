@@ -13,6 +13,7 @@ import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Optional;
@@ -127,15 +128,21 @@ class BookServiceTest {
 
         when(bookRepository.findById(1)).thenReturn(Optional.empty());
 
-        assertThrows(EntityNotFoundException.class,
+        assertThrows(ResponseStatusException.class,
                 () -> bookService.updateBook(1, dto));
     }
 
     @Test
-    void testDeleteBook() {
+    void testDeleteBook_success() {
+
+        when(bookRepository.existsById(1)).thenReturn(true);
+        doNothing().when(bookRecordRepository).deleteByBookId(1);
+        doNothing().when(bookRepository).deleteById(1);
         bookService.deleteBook(1);
-        verify(bookRecordRepository, times(1)).deleteByBookId(1);
-        verify(bookRepository, times(1)).deleteById(1);
+        verify(bookRepository).existsById(1);
+        verify(bookRecordRepository).deleteByBookId(1);
+        verify(bookRepository).deleteById(1);
+
     }
 
     @Test

@@ -35,7 +35,7 @@ class BorrowedRecordServiceTest {
     }
 
     @Test
-    void rtestRegisterBookRent_success() {
+    void testRegisterBookRent_success() {
         // Arrange
         Book book = new Book();
         book.setId(1);
@@ -46,7 +46,7 @@ class BorrowedRecordServiceTest {
         bookRecord.setStatus("AVAILABLE");
 
         when(bookRecordRepository.findById(100)).thenReturn(Optional.of(bookRecord));
-        when(borrowedRecordRepository.existsByBorrowerIdAndBookId(1, 1)).thenReturn(false);
+        when(borrowedRecordRepository.existsByBorrowerIdAndBookIdAndReturnDateIsNull(1, 1)).thenReturn(false);
 
         // Act
         BookRecordDTO dto = borrowedRecordService.registerBookRent(1, 100);
@@ -83,7 +83,7 @@ class BorrowedRecordServiceTest {
         bookRecord.setStatus("AVAILABLE");
 
         when(bookRecordRepository.findById(100)).thenReturn(Optional.of(bookRecord));
-        when(borrowedRecordRepository.existsByBorrowerIdAndBookId(1, 1)).thenReturn(true);
+        when(borrowedRecordRepository.existsByBorrowerIdAndBookIdAndReturnDateIsNull(1, 1)).thenReturn(true);
 
         assertThrows(ResponseStatusException.class,
                 () -> borrowedRecordService.registerBookRent(1, 100));

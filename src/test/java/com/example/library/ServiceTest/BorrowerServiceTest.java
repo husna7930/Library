@@ -7,6 +7,8 @@ import com.example.library.repository.BorrowerRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Optional;
@@ -140,10 +142,11 @@ class BorrowerServiceTest {
         when(borrowerRepository.existsById(999)).thenReturn(false);
 
         // Act & Assert
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class,
                 () -> borrowerService.deleteBorrower(999));
 
-        assertEquals("Borrower not found", exception.getMessage());
+        assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
+        assertEquals("Borrower not found", exception.getReason());
         verify(borrowerRepository).existsById(999);
         verify(borrowerRepository, never()).deleteById(anyInt());
     }
